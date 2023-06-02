@@ -556,6 +556,13 @@ func (vlog *valueLog) init(db *DB) {
 	vlog.discardStats = lf
 }
 
+// Spade A:
+//  1. load all vlog files in filesMap
+//  2. iterate filesMap and delete empty vlog file (size == vlogHeaderSize)
+//  3. use LogFile::iterate to get the offset of the next entry of the last
+//     entry of the last vlog file and truncate it according to the offset,
+//     as we don't want to write more in it.
+//  4. create new vlog file for the following write
 func (vlog *valueLog) open(db *DB) error {
 	// We don't need to open any vlog files or collect stats for GC if DB is opened
 	// in InMemory mode. InMemory mode doesn't create any files/directories on disk.
